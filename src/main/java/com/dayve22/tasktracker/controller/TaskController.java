@@ -3,6 +3,7 @@ package com.dayve22.tasktracker.controller;
 import com.dayve22.tasktracker.dto.TaskRequest;
 import com.dayve22.tasktracker.dto.UpdateTaskStatusRequest;
 import com.dayve22.tasktracker.model.Task;
+import com.dayve22.tasktracker.service.AIService;
 import com.dayve22.tasktracker.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,5 +54,13 @@ public class TaskController {
                                            @PathVariable Long userId,
                                            Principal principal) {
         return ResponseEntity.ok(taskService.assignTask(taskId, userId, principal.getName()));
+    }
+
+    @Autowired
+    private AIService aiService;
+
+    @GetMapping("/generate-description")
+    public ResponseEntity<String> generateDescription(@RequestParam String title) {
+        return ResponseEntity.ok(aiService.generateTaskDescription(title));
     }
 }
