@@ -35,7 +35,7 @@ public class TaskController {
     }
 
     // Get specific task details
-    @GetMapping("/tasks/{taskId}")
+    @GetMapping("/{taskId:[0-9]+}")
     public ResponseEntity<Task> getTaskById(@PathVariable Long taskId, Principal principal) {
         return ResponseEntity.ok(taskService.getTaskById(taskId, principal.getName()));
     }
@@ -59,7 +59,7 @@ public class TaskController {
     @Autowired
     private AIService aiService;
 
-    @GetMapping("/generate-description")
+    @GetMapping("/generate-ai-description")
     public ResponseEntity<String> generateDescription(@RequestParam String title) {
         return ResponseEntity.ok(aiService.generateTaskDescription(title));
     }
