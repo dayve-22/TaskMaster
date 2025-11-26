@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -39,7 +40,10 @@ public class Task {
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
-    // We will add attachments later
-    // @ElementCollection
-    // private List<String> attachmentUrls;
+    // In Task.java
+    @ElementCollection
+    @CollectionTable(name = "task_attachments", joinColumns = @JoinColumn(name = "task_id"))
+    @Column(name = "attachment_url")
+    private List<String> attachments = new ArrayList<>();
+
 }

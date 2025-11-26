@@ -91,4 +91,23 @@ public class TaskService {
         task.setAssignee(assignee);
         return taskRepository.save(task);
     }
+    public List<Task> getTasksAssignedToUser(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+        return taskRepository.findByAssigneeId(user.getId());
+    }
+
+    // User Story: Filter and Search logic
+    public List<Task> getTasks(Long projectId, TaskStatus status, String keyword, String username) {
+        // Validate Access
+        projectService.getProjectById(projectId, username);
+
+        if (keyword != null && !keyword.isEmpty()) {
+            return taskRepository.searchTasks(projectId, keyword);
+        } else if (status != null) {
+            return taskRepository.findByProjectIdAndStatus(projectId, status);
+        } else {
+            return taskRepository.findByProjectId(projectId);
+        }
+    }
 }

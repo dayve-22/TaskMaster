@@ -3,6 +3,7 @@ package com.dayve22.tasktracker.controller;
 import com.dayve22.tasktracker.dto.TaskRequest;
 import com.dayve22.tasktracker.dto.UpdateTaskStatusRequest;
 import com.dayve22.tasktracker.model.Task;
+import com.dayve22.tasktracker.model.TaskStatus;
 import com.dayve22.tasktracker.service.AIService;
 import com.dayve22.tasktracker.service.TaskService;
 import jakarta.validation.Valid;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -63,4 +65,30 @@ public class TaskController {
     public ResponseEntity<String> generateDescription(@RequestParam String title) {
         return ResponseEntity.ok(aiService.generateTaskDescription(title));
     }
+
+    @GetMapping("/tasks/assigned")
+    public ResponseEntity<List<Task>> getAssignedTasks(Principal principal) {
+        return ResponseEntity.ok(taskService.getTasksAssignedToUser(principal.getName()));
+    }
+
+
+    @GetMapping("/projects/{projectId}/tasks")
+    public ResponseEntity<List<Task>> getProjectTasks(
+            @PathVariable Long projectId,
+            @RequestParam(required = false) TaskStatus status,
+            @RequestParam(required = false) String search,
+            Principal principal) {
+        return ResponseEntity.ok(taskService.getTasks(projectId, status, search, principal.getName()));
+    }
+
+    @PostMapping("/tasks/{taskId}/attachments")
+    public ResponseEntity<Task> addAttachment(@PathVariable Long taskId,
+                                              @RequestBody Map<String, String> payload,
+                                              Principal principal) {
+        // You would add a simple method in TaskService to append to the list
+        // task.getAttachments().add(payload.get("url"));
+        // taskRepository.save(task);
+        return ResponseEntity.ok(taskService.addAttachment(taskId, payload.get("url"), principal.getName()));
+    }
+
 }
