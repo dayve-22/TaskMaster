@@ -3,8 +3,6 @@ package com.dayve22.tasktracker.controller;
 import com.dayve22.tasktracker.dto.TaskRequest;
 import com.dayve22.tasktracker.dto.UpdateTaskStatusRequest;
 import com.dayve22.tasktracker.model.Task;
-import com.dayve22.tasktracker.model.TaskStatus;
-import com.dayve22.tasktracker.service.AIService;
 import com.dayve22.tasktracker.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +20,9 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
+    @Autowired
+    private com.dayve22.tasktracker.service.AIService aiService;
+
     // Create Task inside a project
     @PostMapping("/projects/{projectId}/tasks")
     public ResponseEntity<Task> createTask(@PathVariable Long projectId,
@@ -30,14 +31,17 @@ public class TaskController {
         return ResponseEntity.ok(taskService.createTask(projectId, request, principal.getName()));
     }
 
-    // Get all tasks for a project
     @GetMapping("/projects/{projectId}/tasks")
-    public ResponseEntity<List<Task>> getTasksByProject(@PathVariable Long projectId, Principal principal) {
-        return ResponseEntity.ok(taskService.getTasksForProject(projectId, principal.getName()));
+    public ResponseEntity<List<Task>> getProjectTasks(
+            @PathVariable Long projectId,
+            @RequestParam(required = false) com.dayve22.tasktracker.model.TaskStatus status,
+            @RequestParam(required = false) String search,
+            Principal principal) {
+        return ResponseEntity.ok(taskService.getTasks(projectId, status, search, principal.getName()));
     }
 
     // Get specific task details
-    @GetMapping("/{taskId:[0-9]+}")
+    @GetMapping("/tasks/{taskId:[0-9]+}")
     public ResponseEntity<Task> getTaskById(@PathVariable Long taskId, Principal principal) {
         return ResponseEntity.ok(taskService.getTaskById(taskId, principal.getName()));
     }
@@ -58,10 +62,7 @@ public class TaskController {
         return ResponseEntity.ok(taskService.assignTask(taskId, userId, principal.getName()));
     }
 
-    @Autowired
-    private AIService aiService;
-
-    @GetMapping("/generate-ai-description")
+    @GetMapping("/tasks/generate-ai-description")
     public ResponseEntity<String> generateDescription(@RequestParam String title) {
         return ResponseEntity.ok(aiService.generateTaskDescription(title));
     }
@@ -71,24 +72,11 @@ public class TaskController {
         return ResponseEntity.ok(taskService.getTasksAssignedToUser(principal.getName()));
     }
 
-
-    @GetMapping("/projects/{projectId}/tasks")
-    public ResponseEntity<List<Task>> getProjectTasks(
-            @PathVariable Long projectId,
-            @RequestParam(required = false) TaskStatus status,
-            @RequestParam(required = false) String search,
-            Principal principal) {
-        return ResponseEntity.ok(taskService.getTasks(projectId, status, search, principal.getName()));
-    }
-
+    // Add Attachment
     @PostMapping("/tasks/{taskId}/attachments")
     public ResponseEntity<Task> addAttachment(@PathVariable Long taskId,
                                               @RequestBody Map<String, String> payload,
                                               Principal principal) {
-        // You would add a simple method in TaskService to append to the list
-        // task.getAttachments().add(payload.get("url"));
-        // taskRepository.save(task);
         return ResponseEntity.ok(taskService.addAttachment(taskId, payload.get("url"), principal.getName()));
     }
-
 }

@@ -2,7 +2,9 @@ package com.dayve22.tasktracker.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +27,8 @@ public class Project {
 
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
+    @ToString.Exclude           // Prevent infinite loop
+    @EqualsAndHashCode.Exclude
     private User owner;
 
     @ManyToMany
@@ -33,8 +37,12 @@ public class Project {
             joinColumns = @JoinColumn(name = "project_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
+    @ToString.Exclude           // Prevent infinite loop
+    @EqualsAndHashCode.Exclude
     private Set<User> members = new HashSet<>();
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude           // Prevent infinite loop
+    @EqualsAndHashCode.Exclude
     private List<Task> tasks;
 }

@@ -1,5 +1,6 @@
 package com.dayve22.tasktracker.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -13,6 +14,7 @@ public class TaskRequest {
     private String description;
 
     @FutureOrPresent(message = "Due date must be in the future or today")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dueDate;
 
     private Long assigneeId; // Optional: Assign immediately upon creation

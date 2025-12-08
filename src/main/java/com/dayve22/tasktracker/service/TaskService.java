@@ -110,4 +110,17 @@ public class TaskService {
             return taskRepository.findByProjectId(projectId);
         }
     }
+
+    @Transactional
+    public Task addAttachment(Long taskId, String url, String username) {
+        Task task = getTaskById(taskId, username);
+
+        if (task.getAttachments() == null) {
+            task.setAttachments(new java.util.ArrayList<>());
+        }
+
+        task.getAttachments().add(url);
+
+        return taskRepository.save(task);
+    }
 }
